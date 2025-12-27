@@ -1,62 +1,62 @@
-import {useMemo, useState} from "react";
-import {answerCard} from "../api/cardApi";
-import {withToast} from "./error/errorWrapper";
+import { useMemo, useState } from "react";
+import { answerCard } from "../api/cardApi";
+import { withToast } from "./error/errorWrapper";
 
 import {
-    Alert,
     Box,
     Button,
-    Chip,
-    Divider,
     Paper,
     Stack,
     TextField,
     Typography,
 } from "@mui/material";
+import AnswerRevealZone from "./AnswerRevealZone";
 
 export default function CardAnswer({
                                        card,
                                        onAnswered,
                                    }: {
     card: any;
-    onAnswered?: () => void;
+    onAnswered?: (cardId: string) => void;
 }) {
     const [userAnswer, setUserAnswer] = useState("");
     const [showCorrection, setShowCorrection] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isCorrect = useMemo(() => {
-        const ua = (userAnswer ?? "").trim().toLowerCase();
-        const ca = (card?.answer ?? "").trim().toLowerCase();
+        const ua = userAnswer.trim().toLowerCase();
+        const ca = card.answer.trim().toLowerCase();
         return ua.length > 0 && ua === ca;
-    }, [userAnswer, card?.answer]);
+    }, [userAnswer, card.answer]);
+
+    const finalize = () => {
+        setUserAnswer("");
+        setShowCorrection(false);
+        onAnswered?.(card.id);
+    };
 
     const handleSubmit = async () => {
         if (isSubmitting) return;
 
-        const ua = userAnswer.trim();
-        if (!ua) {
+        if (!userAnswer.trim()) {
             setShowCorrection(true);
             return;
         }
 
-        // Correct
+        // Correct answer
         if (isCorrect) {
             setIsSubmitting(true);
+
             const result = await withToast(answerCard(card.id, true), {
                 successMessage: "Correct answer!",
             });
-            setIsSubmitting(false);
 
-            if (result.ok) {
-                setUserAnswer("");
-                setShowCorrection(false);
-                onAnswered?.();
-            }
+            setIsSubmitting(false);
+            if (result.ok) finalize();
             return;
         }
 
-        // Incorrect
+        // Incorrect = show correction zone
         setShowCorrection(true);
     };
 
@@ -69,12 +69,7 @@ export default function CardAnswer({
         });
 
         setIsSubmitting(false);
-
-        if (result.ok) {
-            setUserAnswer("");
-            setShowCorrection(false);
-            onAnswered?.();
-        }
+        if (result.ok) finalize();
     };
 
     const handleRetryLater = async () => {
@@ -86,16 +81,11 @@ export default function CardAnswer({
         });
 
         setIsSubmitting(false);
-
-        if (result.ok) {
-            setUserAnswer("");
-            setShowCorrection(false);
-            onAnswered?.();
-        }
+        if (result.ok) finalize();
     };
 
     return (
-        <Paper variant="outlined" sx={{p: 2, borderRadius: 2}}>
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
             <Stack spacing={2}>
                 <Box>
                     <Typography variant="overline" color="text.secondary">
@@ -104,7 +94,7 @@ export default function CardAnswer({
                     <Typography variant="h6">{card.question}</Typography>
                 </Box>
 
-                <Stack direction={{xs: "column", sm: "row"}} spacing={1.5}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                     <TextField
                         fullWidth
                         size="small"
@@ -118,7 +108,7 @@ export default function CardAnswer({
                         variant="contained"
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        sx={{minWidth: 120}}
+                        sx={{ minWidth: 120 }}
                     >
                         Submit
                     </Button>
@@ -135,83 +125,5 @@ export default function CardAnswer({
                 )}
             </Stack>
         </Paper>
-    );
-}
-
-function AnswerRevealZone({
-                              userAnswer,
-                              originalAnswer,
-                              onForceValidation,
-                              onRetryLater,
-                              disabled,
-                          }: {
-    userAnswer: string;
-    originalAnswer: string;
-    onForceValidation: () => void;
-    onRetryLater: () => void;
-    disabled: boolean;
-}) {
-    return (
-        <Alert
-            severity="warning"
-            variant="outlined"
-            sx={{borderRadius: 2}}
-            icon={false}
-        >
-            <Stack spacing={1.5}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography fontWeight={700}>Not quite.</Typography>
-                    <Chip size="small" label="Answer revealed"/>
-                </Stack>
-
-                <Divider/>
-
-                <Box>
-                    <Typography variant="caption" color="text.secondary">
-                        Your answer
-                    </Typography>
-                    <Typography sx={{mt: 0.5}}>
-                        {userAnswer?.trim() ? userAnswer : "—"}
-                    </Typography>
-                </Box>
-
-                <Box>
-                    <Typography variant="caption" color="text.secondary">
-                        Original answer
-                    </Typography>
-                    <Typography sx={{mt: 0.5}} fontWeight={700}>
-                        {originalAnswer}
-                    </Typography>
-                </Box>
-
-                <Stack
-                    direction={{xs: "column", sm: "row"}}
-                    spacing={1}
-                    sx={{pt: 0.5}}
-                >
-                    <Button
-                        variant="contained"
-                        color="success"
-                        onClick={onForceValidation}
-                        disabled={disabled}
-                    >
-                        Force validation
-                    </Button>
-
-                    <Button
-                        variant="outlined"
-                        onClick={onRetryLater}
-                        disabled={disabled}
-                    >
-                        Retry later
-                    </Button>
-                </Stack>
-
-                <Typography variant="caption" color="text.secondary">
-                    Force validation marks it as correct (moves up). Retry later marks it as incorrect (back to category
-                    1).
-                </Typography>
-            </Stack>
-        </Alert>
     );
 }

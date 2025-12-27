@@ -1,40 +1,42 @@
-import {useEffect, useState} from 'react';
-import {answerCard, getQuizzCards} from '../api/cardApi';
-import CardAnswer from '../components/CardAnswer';
-import {withToast} from "../components/error/errorWrapper.ts";
+import { useEffect, useState } from "react";
+import { getQuizzCards } from "../api/cardApi";
+import CardAnswer from "../components/CardAnswer";
+import { withToast } from "../components/error/errorWrapper";
 
 export default function QuizzPage() {
     const [cards, setCards] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const loadCards = async () => {
-        try {
+    useEffect(() => {
+        (async () => {
+            setLoading(true);
+
             const result = await withToast(getQuizzCards(), {
                 errorMessage: "Failed to load quizz!",
             });
-            if (result.ok) {
-                setCards(result.data);
-                if (result.data.length == 0) {
-                    return <p>No quizz today</p>
-                }
 
-            }
-        } catch (e) {
-            console.log(e.message)
-        }
-    };
-
-    useEffect(() => {
-        loadCards();
+            if (result.ok) setCards(result.data);
+            setLoading(false);
+        })();
     }, []);
+
+    const handleAnswered = (cardId: string) => {
+        setCards((prev) => prev.filter((c) => c.id !== cardId));
+    };
 
     return (
         <div>
             <h2>Today’s Quizz</h2>
-            {cards.map(card => (
+
+            {loading && <p>Loading…</p>}
+
+            {!loading && cards.length === 0 && <p>No quizz today</p>}
+
+            {cards.map((card) => (
                 <CardAnswer
                     key={card.id}
                     card={card}
-                    onAnswered={loadCards}
+                    onAnswered={handleAnswered}
                 />
             ))}
         </div>

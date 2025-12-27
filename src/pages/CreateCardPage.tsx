@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import CardForm from '../components/CardForm';
-import CardList from '../components/CardList';
 import CardWithAllInfo from "../components/CardWithAllInfo.tsx";
 
 export default function CreateCardPage() {
