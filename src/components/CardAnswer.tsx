@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { answerCard } from '../api/cardApi';
 
-export default function CardAnswer({ card }: { card: any }) {
+export default function CardAnswer({ card, onAnswered }: { card: any; onAnswered?: () => void }) {
     const [userAnswer, setUserAnswer] = useState('');
     const [feedback, setFeedback] = useState('');
 
@@ -12,6 +12,8 @@ export default function CardAnswer({ card }: { card: any }) {
         } else {
             setFeedback('Correct!');
         }
+        setUserAnswer('');
+        if (onAnswered) onAnswered();
     };
 
     return (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createCard } from '../api/cardApi';
 
-export default function CardForm() {
+export default function CardForm({ onCardCreated }: { onCardCreated?: (card: any) => void }) {
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [tag, setTag] = useState('');
@@ -10,12 +10,13 @@ export default function CardForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await createCard(question, answer, tag);
+            const newCard = await createCard(question, answer, tag);
             setMessage('Card created!');
             setQuestion('');
             setAnswer('');
             setTag('');
-        } catch (err) {
+            if (onCardCreated) onCardCreated(newCard);
+        } catch {
             setMessage('Error creating card');
         }
     };

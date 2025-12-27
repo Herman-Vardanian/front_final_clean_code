@@ -1,14 +1,19 @@
-import CardForm from './components/CardForm';
-import Quizz from './components/Quizz';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import CreateCardPage from './pages/CreateCardPage.tsx';
+import CardPage from './pages/CardPage.tsx';
 
 export default function App() {
     return (
-        <div>
-            <h1>Clean code App</h1>
-            <h2>Create Card</h2>
-            <CardForm />
-            <h2>Quizz</h2>
-            <Quizz />
-        </div>
+        <Router>
+            <nav>
+                <Link to="/">Home</Link> | <Link to="/create-card">Create Card</Link> | <Link to="/cards">Quizz</Link>
+            </nav>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/create-card" element={<CreateCardPage />} />
+                <Route path="/cards" element={<CardPage />} />
+            </Routes>
+        </Router>
     );
 }
