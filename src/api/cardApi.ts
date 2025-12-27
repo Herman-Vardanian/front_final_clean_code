@@ -1,3 +1,6 @@
+import {apiFetch} from "./helper/apiFetch.ts";
+import {withToast} from "../components/error/errorWrapper.ts";
+
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function createCard(question: string, answer: string, tag?: string) {
@@ -16,17 +19,12 @@ export async function getQuizzCards() {
     return res.json();
 }
 
-export async function answerCard(cardId: string, userAnswer: string, force = false) {
-    const res = await fetch(`${API_URL}/cards/${cardId}/answer`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userAnswer, force }),
+export function answerCard(cardId: string, isValid: boolean) {
+    return apiFetch<void>(`${API_URL}/cards/${cardId}/answer`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isValid }),
     });
-    if (!res.ok) {
-        if (res.status === 200) return res.json();
-        throw new Error('Failed to answer card');
-    }
-    return res.json();
 }
 
 export async function getCardsByTag(tag = '') {
