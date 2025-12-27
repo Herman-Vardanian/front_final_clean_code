@@ -10,10 +10,10 @@ export async function createCard(question: string, answer: string, tag?: string)
     return res.json();
 }
 
-export async function getQuizCards(date?: string) {
+export async function getQuizzCards(date?: string) {
     const url = date ? `${BASE_URL}/cards/quizz?date=${date}` : `${BASE_URL}/cards/quizz`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch quiz cards');
+    if (!res.ok) throw new Error('Failed to fetch quizz cards');
     return res.json();
 }
 
