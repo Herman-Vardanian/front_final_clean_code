@@ -3,6 +3,14 @@ import {withToast} from "../components/error/errorWrapper.ts";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+export type CardDto = {
+    id: string;
+    question: string;
+    answer: string;
+    category: string;
+    tag?: string | null;
+};
+
 export async function createCard(question: string, answer: string, tag?: string) {
     return httpSender<any>(`${API_URL}/cards`, {
         method: "POST",
@@ -25,8 +33,8 @@ export function answerCard(cardId: string, isValid: boolean) {
     });
 }
 
-export async function getCardsByTag(tag = '') {
-    return httpSender<void>(`${API_URL}/cards/tag?tag=${tag}`, {
-        method: "POST"
+export async function fetchAllCards() {
+    return httpSender<CardDto>(`${API_URL}/cards`, {
+        method: "GET"
     });
 }

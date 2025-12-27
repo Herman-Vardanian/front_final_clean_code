@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CardForm from '../components/CardForm';
 import CardList from '../components/CardList';
+import CardWithAllInfo from "../components/CardWithAllInfo.tsx";
 
 export default function CreateCardPage() {
     const [cards, setCards] = useState<any[]>([]);
@@ -14,7 +15,7 @@ export default function CreateCardPage() {
             <h2>Create a Card</h2>
             <CardForm onCardCreated={handleCardCreated} />
             <h3>Recently created cards</h3>
-            <CardList cards={cards} />
+            <CardWithAllInfo cards={cards} selectedTags={[]} />
         </div>
     );
 }
