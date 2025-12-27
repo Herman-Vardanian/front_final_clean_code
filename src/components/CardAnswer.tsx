@@ -40,7 +40,7 @@ export default function CardAnswer({
             return;
         }
 
-        // Correct → validate immediately
+        // Correct
         if (isCorrect) {
             setIsSubmitting(true);
             const result = await withToast(answerCard(card.id, true), {
@@ -56,6 +56,7 @@ export default function CardAnswer({
             return;
         }
 
+        // Incorrect
         setShowCorrection(true);
     };
 

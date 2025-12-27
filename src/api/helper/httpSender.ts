@@ -1,4 +1,4 @@
-import type {ApiResult} from "./apiResult.ts";
+import type {ApiResult} from "./apiResultType.ts";
 
 async function safeJson(res: Response) {
     try {
@@ -8,7 +8,7 @@ async function safeJson(res: Response) {
     }
 }
 
-export async function apiFetch<T>(
+export async function httpSender<T>(
     input: RequestInfo,
     init?: RequestInit
 ): Promise<ApiResult<T>> {

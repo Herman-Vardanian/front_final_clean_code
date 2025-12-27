@@ -1,4 +1,4 @@
-import type {ApiResult} from "../../api/helper/apiResult.ts";
+import type {ApiResult} from "../../api/helper/apiResultType.ts";
 
 import toast from "react-hot-toast";
 
@@ -6,16 +6,17 @@ export function withToast<T>(
     promise: Promise<ApiResult<T>>,
     options?: {
         successMessage?: string;
-        errorMessage?: (msg: string) => string;
+        errorMessage?: string | ((msg: string) => string);
     }
 ): Promise<ApiResult<T>> {
     return promise.then(result => {
         if (!result.ok) {
-            toast.error(
-                options?.errorMessage
+            const message =
+                typeof options?.errorMessage === "function"
                     ? options.errorMessage(result.message)
-                    : result.message
-            );
+                    : options?.errorMessage ?? result.message;
+
+            toast.error(message);
         } else if (options?.successMessage) {
             toast.success(options.successMessage);
         }

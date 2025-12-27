@@ -1,26 +1,31 @@
-import { useEffect, useState } from 'react';
-import { getQuizzCards } from '../api/cardApi';
+import {useEffect, useState} from 'react';
+import {answerCard, getQuizzCards} from '../api/cardApi';
 import CardAnswer from '../components/CardAnswer';
+import {withToast} from "../components/error/errorWrapper.ts";
 
 export default function CardPage() {
     const [cards, setCards] = useState<any[]>([]);
-    const [error, setError] = useState('');
 
     const loadCards = async () => {
         try {
-            const data = await getQuizzCards();
-            setCards(data);
-        } catch {
-            setError('Failed to load quizz');
+            const result = await withToast(getQuizzCards(), {
+                errorMessage: "Failed to load quizz!",
+            });
+            if (result.ok) {
+                setCards(result.data);
+                if (result.data.length == 0) {
+                    return <p>No quizz today</p>
+                }
+
+            }
+        } catch (e) {
+            console.log(e.message)
         }
     };
 
     useEffect(() => {
         loadCards();
     }, []);
-
-    if (error) return <p>{error}</p>;
-    if (cards.length === 0) return <p>No quizz today</p>;
 
     return (
         <div>
